@@ -8,6 +8,6 @@ import androidx.compose.ui.Modifier
 import androidx.navigation.NavHostController
 
 @Composable
-fun HistoryScreen(navController: NavHostController, innerPadding: PaddingValues) {
-    Text("History", modifier = Modifier.padding(innerPadding))
+fun TimerScreen(navController: NavHostController, innerPadding: PaddingValues) {
+    Text("Timer", modifier = Modifier.padding(innerPadding))
 }

@@ -18,6 +18,7 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
@@ -25,6 +26,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
+import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import com.aryaman.pomodoroapp.ui.nav.ScreenNames
 
@@ -36,8 +38,10 @@ fun CustomTopAppBar(navController: NavHostController = rememberNavController()) 
     TopAppBar(
         modifier = Modifier.padding(8.dp),
         title = {
-            Text(text = "Pomodoro", modifier = Modifier.padding(start = 8.dp),
-                fontSize = 24.sp, fontWeight = FontWeight.Bold, fontFamily = FontFamily.SansSerif)
+            Text(
+                text = "Pomodoro", modifier = Modifier.padding(start = 8.dp),
+                fontSize = 24.sp, fontWeight = FontWeight.Bold, fontFamily = FontFamily.SansSerif
+            )
         },
         navigationIcon = {},
         actions = {
@@ -45,7 +49,7 @@ fun CustomTopAppBar(navController: NavHostController = rememberNavController()) 
                 Icon(imageVector = Icons.Default.Settings, contentDescription = "Settings")
             }
         },
-        expandedHeight = TopAppBarDefaults.TopAppBarExpandedHeight,
+        expandedHeight = TopAppBarDefaults.MediumAppBarCollapsedHeight,
         windowInsets = TopAppBarDefaults.windowInsets,
         colors = TopAppBarDefaults.topAppBarColors(),
         scrollBehavior = TopAppBarDefaults.pinnedScrollBehavior()
@@ -55,22 +59,38 @@ fun CustomTopAppBar(navController: NavHostController = rememberNavController()) 
 @Composable
 @Preview
 fun CustomBottomNavBar(navController: NavHostController = rememberNavController()) {
+    val navBackStackEntry by navController.currentBackStackEntryAsState() // ✅ Get current route
+    val currentRoute = navBackStackEntry?.destination?.route
     NavigationBar {
         NavigationBarItem(
             modifier = Modifier,
-            selected = navController.currentDestination?.route == ScreenNames.HomeScreen.name,
-            onClick = { navController.navigate(ScreenNames.HomeScreen.name) },
-            icon = { Icon(imageVector = Icons.Default.Timer, contentDescription = "HomeScreen") },
+            selected = currentRoute == ScreenNames.TimerScreen.name,
+            onClick = {
+                navController.navigate(ScreenNames.TimerScreen.name) {
+                    popUpTo(ScreenNames.HomeScreen.name) { inclusive = false }
+                    launchSingleTop = true
+                }
+            },
+            icon = { Icon(imageVector = Icons.Default.Timer, contentDescription = "TimerScreen") },
             enabled = true,
-            label = { Text("Timer") },
+            label = {
+                Text(
+                    "Timer"
+                )
+            },
             alwaysShowLabel = false,
             colors = NavigationBarItemDefaults.colors(),
             interactionSource = null,
         )
         NavigationBarItem(
             modifier = Modifier,
-            selected = navController.currentDestination?.route == ScreenNames.HistoryScreen.name,
-            onClick = { navController.navigate(ScreenNames.HistoryScreen.name) },
+            selected = currentRoute == ScreenNames.HistoryScreen.name,
+            onClick = {
+                navController.navigate(ScreenNames.HistoryScreen.name) {
+                    popUpTo(ScreenNames.HomeScreen.name) { inclusive = false }
+                    launchSingleTop = true
+                }
+            },
             icon = { Icon(imageVector = Icons.Default.History, contentDescription = "History") },
             enabled = true,
             label = { Text("History") },
