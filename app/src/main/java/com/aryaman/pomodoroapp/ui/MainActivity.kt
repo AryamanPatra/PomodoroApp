@@ -1,4 +1,4 @@
-package com.aryaman.pomodoroapp
+package com.aryaman.pomodoroapp.ui
 
 import android.os.Bundle
 import androidx.activity.ComponentActivity
@@ -36,12 +36,4 @@ fun Greeting(name: String, modifier: Modifier = Modifier) {
         text = "Hello $name!",
         modifier = modifier
     )
-}
-
-@Preview(showBackground = true)
-@Composable
-fun GreetingPreview() {
-    PomodoroAppTheme {
-        Greeting("Android")
-    }
 }
