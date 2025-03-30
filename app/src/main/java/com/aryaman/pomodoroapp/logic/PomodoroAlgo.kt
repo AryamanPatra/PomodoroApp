@@ -2,21 +2,30 @@ package com.aryaman.pomodoroapp.logic
 
 import android.annotation.SuppressLint
 import android.os.CountDownTimer
-import androidx.compose.runtime.MutableState
+import androidx.compose.runtime.mutableIntStateOf
+import androidx.compose.runtime.mutableStateOf
 
-fun timerStart(isRunning: MutableState<Boolean>, timeLeft: MutableState<Int>){
-    if (!isRunning.value){
-        isRunning.value = true
-        object : CountDownTimer(timeLeft.value * 1000L, 1000) {
-            override fun onTick(millisUntilFinished: Long) {
-                timeLeft.value = (millisUntilFinished / 1000).toInt()
-            }
-            override fun onFinish() {
-                timeLeft.value = 0
-                isRunning.value = false
-            }
+object Session{
+    var isRunning = mutableStateOf(false)
+    var timeLeft = mutableIntStateOf(25*60)
+    private val timer = object : CountDownTimer(timeLeft.intValue * 1000L, 1000) {
+        override fun onTick(millisUntilFinished: Long) {
+            timeLeft.intValue = (millisUntilFinished / 1000).toInt()
+        }
+        override fun onFinish() {
+            timeLeft.intValue = 0
+            isRunning.value = false
+        }
 
-        }.start()
+    }
+
+    fun timerStart(){
+        timer.start()
+    }
+
+    fun timerStop(){
+        timer.cancel()
+        timeLeft.intValue = 25*60
     }
 }
 
