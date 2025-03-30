@@ -1,11 +1,8 @@
 package com.aryaman.pomodoroapp.ui
 
-import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.History
-import androidx.compose.material.icons.filled.PlayArrow
-import androidx.compose.material.icons.filled.Refresh
 import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material.icons.filled.Timer
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -99,4 +96,9 @@ fun CustomBottomNavBar(navController: NavHostController = rememberNavController(
             interactionSource = null,
         )
     }
+}
+
+@Composable
+fun CountdownTimerScreen() {
+
 }
