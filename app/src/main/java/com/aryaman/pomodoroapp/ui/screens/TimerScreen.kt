@@ -15,6 +15,8 @@ import androidx.compose.material3.IconButtonColors
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.mutableIntStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
@@ -25,8 +27,20 @@ import com.aryaman.pomodoroapp.logic.formatTime
 
 @Composable
 fun TimerScreen(navController: NavHostController, innerPadding: PaddingValues) {
+    val displayTimeLeft = remember(Session.isFocusing.value, Session.isBreak.value) {
+        if (Session.isFocusing.value && !Session.isBreak.value) {
+            Session.focusTimeLeft
+        } else if (Session.isBreak.value && !Session.isFocusing.value) {
+            Session.breakTimeLeft
+        } else {
+            mutableIntStateOf(0)
+        }
+    }
+
     Column(
-        modifier = Modifier.padding(innerPadding).fillMaxSize(),
+        modifier = Modifier
+            .padding(innerPadding)
+            .fillMaxSize(),
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Center
     ) {
@@ -37,7 +51,7 @@ fun TimerScreen(navController: NavHostController, innerPadding: PaddingValues) {
         )
         Text(
             modifier = Modifier.padding(bottom = 25.dp),
-            text = "0",
+            text = Session.sessionCount.intValue.toString(),
             style = MaterialTheme.typography.displayMedium,
             fontWeight = FontWeight.SemiBold
         )
@@ -45,11 +59,16 @@ fun TimerScreen(navController: NavHostController, innerPadding: PaddingValues) {
             modifier = Modifier
                 .size(130.dp),
             onClick = {
-                Session.isRunning.value = !Session.isRunning.value
-                if (Session.isRunning.value) {
-                    Session.timerStart()
+                Session.isFocusing.value = !Session.isFocusing.value
+                if (Session.isFocusing.value) {
+                    Session.focusTimerStart()
                 } else {
-                    Session.timerStop()
+                    if (Session.isBreak.value) {
+                        Session.isBreak.value = false
+                        Session.breakTimerStop()
+                    } else {
+                        Session.focusTimerStop()
+                    }
                 }
             },
             colors = IconButtonColors(
@@ -59,16 +78,24 @@ fun TimerScreen(navController: NavHostController, innerPadding: PaddingValues) {
                 disabledContentColor = MaterialTheme.colorScheme.onSurface,
             )
         ) {
-            Icon(modifier = Modifier.size(100.dp),imageVector = if(Session.isRunning.value) Icons.Default.Stop else Icons.Default.PlayArrow, contentDescription = "Play")
+            Icon(
+                modifier = Modifier.size(100.dp),
+                imageVector = if (Session.isFocusing.value && !Session.isBreak.value) Icons.Default.Stop
+                else if (Session.isBreak.value && !Session.isFocusing.value) Icons.Default.Stop
+                else Icons.Default.PlayArrow,
+                contentDescription = "Play"
+            )
         }
         Text(
             modifier = Modifier.padding(top = 25.dp),
-            text = "Focus Time",
+            text = if (Session.isFocusing.value && !Session.isBreak.value) "Focus Time"
+            else if (Session.isBreak.value && !Session.isFocusing.value) "Break Time"
+            else "Start Timer",
             style = MaterialTheme.typography.titleLarge
         )
         Text(
             modifier = Modifier,
-            text = formatTime(Session.timeLeft.intValue),
+            text = formatTime(displayTimeLeft.intValue),
             style = MaterialTheme.typography.displayLarge,
             fontWeight = FontWeight.SemiBold
         )
