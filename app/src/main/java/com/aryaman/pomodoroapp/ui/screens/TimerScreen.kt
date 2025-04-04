@@ -26,7 +26,9 @@ import com.aryaman.pomodoroapp.logic.formatTime
 @Composable
 fun TimerScreen(navController: NavHostController, innerPadding: PaddingValues) {
     Column(
-        modifier = Modifier.padding(innerPadding).fillMaxSize(),
+        modifier = Modifier
+            .padding(innerPadding)
+            .fillMaxSize(),
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Center
     ) {
@@ -37,7 +39,7 @@ fun TimerScreen(navController: NavHostController, innerPadding: PaddingValues) {
         )
         Text(
             modifier = Modifier.padding(bottom = 25.dp),
-            text = "0",
+            text = Session.sessionCount.intValue.toString(),
             style = MaterialTheme.typography.displayMedium,
             fontWeight = FontWeight.SemiBold
         )
@@ -45,11 +47,16 @@ fun TimerScreen(navController: NavHostController, innerPadding: PaddingValues) {
             modifier = Modifier
                 .size(130.dp),
             onClick = {
-                Session.isRunning.value = !Session.isRunning.value
-                if (Session.isRunning.value) {
-                    Session.timerStart()
-                } else {
-                    Session.timerStop()
+                when (Session.currentSessionType.value) {
+                    Session.SessionType.Focus -> {
+                        Session.timerStop()
+                    }
+                    Session.SessionType.Break -> {
+                        Session.timerStop()
+                    }
+                    Session.SessionType.None -> {
+                        Session.timerStart()
+                    }
                 }
             },
             colors = IconButtonColors(
@@ -59,16 +66,27 @@ fun TimerScreen(navController: NavHostController, innerPadding: PaddingValues) {
                 disabledContentColor = MaterialTheme.colorScheme.onSurface,
             )
         ) {
-            Icon(modifier = Modifier.size(100.dp),imageVector = if(Session.isRunning.value) Icons.Default.Stop else Icons.Default.PlayArrow, contentDescription = "Play")
+            Icon(
+                modifier = Modifier.size(100.dp),
+                imageVector = when (Session.currentSessionType.value){
+                    Session.SessionType.None -> Icons.Default.PlayArrow
+                    else -> Icons.Default.Stop
+                },
+                contentDescription = "Play"
+            )
         }
         Text(
             modifier = Modifier.padding(top = 25.dp),
-            text = "Focus Time",
+            text = when (Session.currentSessionType.value){
+                Session.SessionType.Focus -> "Focus Timer"
+                Session.SessionType.Break -> "Break Timer"
+                Session.SessionType.None -> "Start Timer"
+            },
             style = MaterialTheme.typography.titleLarge
         )
         Text(
             modifier = Modifier,
-            text = formatTime(Session.timeLeft.intValue),
+            text = if (Session.currentSessionType.value == Session.SessionType.None) "--:--" else formatTime(Session.timeLeft.intValue),
             style = MaterialTheme.typography.displayLarge,
             fontWeight = FontWeight.SemiBold
         )
