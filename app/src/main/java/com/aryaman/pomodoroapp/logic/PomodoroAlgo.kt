@@ -6,54 +6,46 @@ import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 
 object Session{
-    var sessionCount = mutableIntStateOf(0)
-    var isFocusing = mutableStateOf(false)
-    var isBreak = mutableStateOf(false)
-    var focusTimeLeft = mutableIntStateOf((0.15*60).toInt()) //For testing purpose the time is set low
-    var breakTimeLeft = mutableIntStateOf((0.1*60).toInt())
+    val sessionCount = mutableIntStateOf(0)
+    val currentSessionType = mutableStateOf(SessionType.None)
+    private val timeMap = mapOf(Pair(SessionType.Focus, (0.15*60).toInt()), Pair(SessionType.Break, (0.1*60).toInt()), Pair(SessionType.None, 0))
+    val timeLeft = mutableIntStateOf(timeMap.getValue(SessionType.Focus))
 
-    private val focusTimer = object : CountDownTimer(focusTimeLeft.intValue * 1000L, 1000) {
-        override fun onTick(millisUntilFinished: Long) {
-            focusTimeLeft.intValue = (millisUntilFinished / 1000).toInt()
+    private var timer: CountDownTimer? = null
+
+    fun timerStart(){
+        timer?.cancel()
+        if (currentSessionType.value == SessionType.None){
+            currentSessionType.value = SessionType.Focus
         }
-        override fun onFinish() {
-            focusTimeLeft.intValue = 0
-            isFocusing.value = false
-            focusTimeLeft.intValue = (0.15*60).toInt()
-            sessionCount.intValue++
-            breakTimerStart()
-            isBreak.value = true
-        }
-
+        timer = object : CountDownTimer(timeLeft.intValue * 1000L, 1000) {
+            override fun onTick(millisUntilFinished: Long) {
+                timeLeft.intValue = (millisUntilFinished / 1000).toInt()
+            }
+            override fun onFinish() {
+                if (currentSessionType.value == SessionType.Focus){
+                    sessionCount.intValue++
+                    currentSessionType.value = SessionType.Break
+                }
+                else{
+                    currentSessionType.value = SessionType.Focus
+                }
+                timeLeft.intValue = timeMap.getValue(currentSessionType.value)
+                timerStart()
+            }
+        }.start()
     }
 
-    fun focusTimerStart(){
-        focusTimer.start()
+    fun timerStop(){
+        timer?.cancel()
+        currentSessionType.value = SessionType.None
+        timeLeft.intValue = timeMap.getValue(SessionType.Focus)
     }
 
-    fun focusTimerStop(){
-        focusTimer.cancel()
-        focusTimeLeft.intValue = (0.15*60).toInt()
-    }
-
-    private val breakTimer = object : CountDownTimer(focusTimeLeft.intValue * 1000L, 1000) {
-        override fun onTick(millisUntilFinished: Long) {
-            breakTimeLeft.intValue = (millisUntilFinished / 1000).toInt()
-        }
-        override fun onFinish() {
-            breakTimeLeft.intValue = 0
-            isBreak.value = false
-        }
-
-    }
-
-    fun breakTimerStart(){
-        breakTimer.start()
-    }
-
-    fun breakTimerStop(){
-        breakTimer.cancel()
-        breakTimeLeft.intValue = (0.1*60).toInt()
+    enum class SessionType{
+        Focus,
+        Break,
+        None
     }
 }
 
