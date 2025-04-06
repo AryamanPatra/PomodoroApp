@@ -42,6 +42,17 @@ android {
 
 dependencies {
 
+    // Koin for Android
+    implementation(project.dependencies.platform(libs.koin.bom))
+    implementation(libs.koin.core)
+    // Declare the koin dependencies that you need
+    implementation(libs.koin.android)
+    implementation(libs.koin.core.coroutines)
+    implementation(libs.koin.androidx.workmanager)
+    // Works with test libraries too!
+    testImplementation(libs.koin.test.junit4)
+    testImplementation(libs.koin.android.test)
+
     implementation(libs.androidx.room.runtime)
     implementation(libs.androidx.navigation.compose)
     // If this project uses any Kotlin source, use Kotlin Symbol Processing (KSP)
@@ -49,6 +60,8 @@ dependencies {
     ksp(libs.androidx.room.compiler)
     // optional - Kotlin Extensions and Coroutines support for Room
     implementation(libs.androidx.room.ktx)
+    // optional - Test helpers
+    testImplementation(libs.androidx.room.testing)
 
     implementation(libs.androidx.material.icons.extended)
 
