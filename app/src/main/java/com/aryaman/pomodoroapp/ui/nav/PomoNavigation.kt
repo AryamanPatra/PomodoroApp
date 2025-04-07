@@ -2,6 +2,7 @@ package com.aryaman.pomodoroapp.ui.nav
 
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.MutableIntState
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
@@ -14,7 +15,7 @@ import com.aryaman.pomodoroapp.ui.screens.TimerScreen
 import org.koin.java.KoinJavaComponent.inject
 
 @Composable
-fun MainNavHost(){
+fun MainNavHost(themeChangeState: MutableIntState) {
     val navController = rememberNavController()
     NavHost(
         navController = navController,
@@ -24,7 +25,7 @@ fun MainNavHost(){
             HomeScreen(navController)
         }
         composable(route = ScreenNames.SettingScreen.name) {
-            SettingScreen(navController)
+            SettingScreen(navController, themeChangeState)
         }
     }
 }
