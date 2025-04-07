@@ -6,10 +6,12 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import com.aryaman.pomodoroapp.ui.SessionLogViewModel
 import com.aryaman.pomodoroapp.ui.screens.HistoryScreen
 import com.aryaman.pomodoroapp.ui.screens.HomeScreen
 import com.aryaman.pomodoroapp.ui.screens.SettingScreen
 import com.aryaman.pomodoroapp.ui.screens.TimerScreen
+import org.koin.java.KoinJavaComponent.inject
 
 @Composable
 fun MainNavHost(){
@@ -29,15 +31,16 @@ fun MainNavHost(){
 
 @Composable
 fun BottomNavHost(navController: NavHostController, innerPadding: PaddingValues) {
+    val viewModel: SessionLogViewModel by inject(SessionLogViewModel::class.java)
     NavHost(
         navController = navController,
         startDestination = ScreenNames.TimerScreen.name
     ){
         composable(route = ScreenNames.TimerScreen.name){
-            TimerScreen(navController, innerPadding)
+            TimerScreen(viewModel, innerPadding)
         }
         composable(route = ScreenNames.HistoryScreen.name) {
-            HistoryScreen(navController, innerPadding)
+            HistoryScreen(viewModel, innerPadding)
         }
     }
 }

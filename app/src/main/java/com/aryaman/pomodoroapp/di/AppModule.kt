@@ -3,6 +3,7 @@ package com.aryaman.pomodoroapp.di
 import androidx.room.Room.databaseBuilder
 import com.aryaman.pomodoroapp.data.repository.SessionLogRepository
 import com.aryaman.pomodoroapp.data.source.PomodoroDatabase
+import com.aryaman.pomodoroapp.ui.SessionLogViewModel
 import org.koin.android.ext.koin.androidContext
 import org.koin.dsl.module
 
@@ -22,4 +23,8 @@ val appModule = module {
     single {
         SessionLogRepository(get())
     }
+    single {
+        SessionLogViewModel(get())
+    }
+
 }

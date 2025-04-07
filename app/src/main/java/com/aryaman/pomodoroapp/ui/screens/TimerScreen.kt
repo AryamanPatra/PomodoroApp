@@ -19,12 +19,14 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import androidx.navigation.NavHostController
+import com.aryaman.pomodoroapp.data.model.SessionLog
 import com.aryaman.pomodoroapp.logic.Session
 import com.aryaman.pomodoroapp.logic.formatTime
+import com.aryaman.pomodoroapp.ui.SessionLogViewModel
+import java.sql.Date
 
 @Composable
-fun TimerScreen(navController: NavHostController, innerPadding: PaddingValues) {
+fun TimerScreen(viewModel: SessionLogViewModel, innerPadding: PaddingValues) {
     Column(
         modifier = Modifier
             .padding(innerPadding)
@@ -49,11 +51,15 @@ fun TimerScreen(navController: NavHostController, innerPadding: PaddingValues) {
             onClick = {
                 when (Session.currentSessionType.value) {
                     Session.SessionType.Focus -> {
+                        saveSession(true, viewModel)
                         Session.timerStop()
                     }
+
                     Session.SessionType.Break -> {
+                        saveSession(false, viewModel)
                         Session.timerStop()
                     }
+
                     Session.SessionType.None -> {
                         Session.timerStart()
                     }
@@ -68,7 +74,7 @@ fun TimerScreen(navController: NavHostController, innerPadding: PaddingValues) {
         ) {
             Icon(
                 modifier = Modifier.size(100.dp),
-                imageVector = when (Session.currentSessionType.value){
+                imageVector = when (Session.currentSessionType.value) {
                     Session.SessionType.None -> Icons.Default.PlayArrow
                     else -> Icons.Default.Stop
                 },
@@ -77,7 +83,7 @@ fun TimerScreen(navController: NavHostController, innerPadding: PaddingValues) {
         }
         Text(
             modifier = Modifier.padding(top = 25.dp),
-            text = when (Session.currentSessionType.value){
+            text = when (Session.currentSessionType.value) {
                 Session.SessionType.Focus -> "Focus Timer"
                 Session.SessionType.Break -> "Break Timer"
                 Session.SessionType.None -> "Start Timer"
@@ -86,10 +92,26 @@ fun TimerScreen(navController: NavHostController, innerPadding: PaddingValues) {
         )
         Text(
             modifier = Modifier,
-            text = if (Session.currentSessionType.value == Session.SessionType.None) "--:--" else formatTime(Session.timeLeft.intValue),
+            text = if (Session.currentSessionType.value == Session.SessionType.None) "--:--" else formatTime(
+                Session.timeLeft.intValue
+            ),
             style = MaterialTheme.typography.displayLarge,
             fontWeight = FontWeight.SemiBold
         )
 
     }
+}
+
+private fun saveSession(wasFocusing: Boolean, viewModel: SessionLogViewModel) {
+    val sessionCount = Session.sessionCount.intValue
+    val timeFocusedInMin =
+        (if (wasFocusing) Session.timeMap[Session.SessionType.Focus]!! - Session.timeLeft.intValue else 0) +
+                (sessionCount * Session.timeMap[Session.SessionType.Focus]!!)
+    viewModel.upsertSessionLog(
+        SessionLog(
+            sessionCount = sessionCount,
+            totalFocusTimeInMin = timeFocusedInMin,
+            date = Date(System.currentTimeMillis())
+        )
+    )
 }

@@ -8,7 +8,7 @@ import androidx.compose.runtime.mutableStateOf
 object Session{
     val sessionCount = mutableIntStateOf(0)
     val currentSessionType = mutableStateOf(SessionType.None)
-    private val timeMap = mapOf(Pair(SessionType.Focus, (0.15*60).toInt()), Pair(SessionType.Break, (0.1*60).toInt()), Pair(SessionType.None, 0))
+    val timeMap = mapOf(Pair(SessionType.Focus, (0.15*60).toInt()), Pair(SessionType.Break, (0.1*60).toInt()), Pair(SessionType.None, 0))
     val timeLeft = mutableIntStateOf(timeMap.getValue(SessionType.Focus))
 
     private var timer: CountDownTimer? = null
@@ -38,6 +38,7 @@ object Session{
 
     fun timerStop(){
         timer?.cancel()
+        sessionCount.intValue = 0
         currentSessionType.value = SessionType.None
         timeLeft.intValue = timeMap.getValue(SessionType.Focus)
     }
