@@ -8,7 +8,7 @@ import java.sql.Date
 @Entity(tableName = "session_log")
 data class SessionLog(
     @PrimaryKey(autoGenerate = true)
-    val id: Long?,
+    val id: Long? = null ,
     val sessionCount: Int,
     val totalFocusTimeInMin: Int,
     @TypeConverters(DateConverter::class)
