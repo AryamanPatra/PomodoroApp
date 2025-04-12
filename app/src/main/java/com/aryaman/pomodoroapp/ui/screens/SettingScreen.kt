@@ -110,37 +110,46 @@ fun SettingScreen(
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.Top
         ) {
-            Surface(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .wrapContentHeight()
-                    .clickable {
-                        focusTimeDialogState.value = true
-                    }
-            ) {
-                Column(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .wrapContentHeight()
-                        .padding(vertical = 15.dp, horizontal = 50.dp),
-                    horizontalAlignment = Alignment.Start,
-                    verticalArrangement = Arrangement.SpaceEvenly
-                ) {
-                    Text(
-                        text = "Focus Time",
-                        style = MaterialTheme.typography.titleMedium,
-                        fontWeight = FontWeight.W600
-                    )
-                    Spacer(modifier = Modifier.height(4.dp))
-                    Text(
-                        text = Session.editableFocusTimeState.floatValue.toString(),
-                        style = MaterialTheme.typography.titleSmall,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant,
-                        fontWeight = FontWeight.W400
-                    )
-                }
-            }
+            TimeChangeSetting("Focus",focusTimeDialogState)
+            TimeChangeSetting("Break",breakTimeDialogState)
             ThemeChangeSetting(themeDialogState, themeChoices, themeChangeState)
+        }
+    }
+}
+
+@Composable
+private fun TimeChangeSetting(
+    focusOrBreak: String,
+    timeDialogState: MutableState<Boolean>
+) {
+    Surface(
+        modifier = Modifier
+            .fillMaxWidth()
+            .wrapContentHeight()
+            .clickable {
+                timeDialogState.value = true
+            }
+    ) {
+        Column(
+            modifier = Modifier
+                .fillMaxWidth()
+                .wrapContentHeight()
+                .padding(vertical = 15.dp, horizontal = 50.dp),
+            horizontalAlignment = Alignment.Start,
+            verticalArrangement = Arrangement.SpaceEvenly
+        ) {
+            Text(
+                text = "$focusOrBreak Time",
+                style = MaterialTheme.typography.titleMedium,
+                fontWeight = FontWeight.W600
+            )
+            Spacer(modifier = Modifier.height(4.dp))
+            Text(
+                text = if (focusOrBreak == "Focus") Session.editableFocusTimeState.floatValue.toString() else Session.editableBreakTimeState.floatValue.toString(),
+                style = MaterialTheme.typography.titleSmall,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                fontWeight = FontWeight.W400
+            )
         }
     }
 }
