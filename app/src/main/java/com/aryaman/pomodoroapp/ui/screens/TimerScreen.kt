@@ -1,5 +1,6 @@
 package com.aryaman.pomodoroapp.ui.screens
 
+import android.content.Context
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
@@ -17,6 +18,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.aryaman.pomodoroapp.data.model.SessionLog
@@ -27,6 +29,10 @@ import java.sql.Date
 
 @Composable
 fun TimerScreen(viewModel: SessionLogViewModel, innerPadding: PaddingValues) {
+    //Session Times with stored value
+    initSessionTime(LocalContext.current)
+
+    //Main UI Code
     Column(
         modifier = Modifier
             .padding(innerPadding)
@@ -100,6 +106,11 @@ fun TimerScreen(viewModel: SessionLogViewModel, innerPadding: PaddingValues) {
         )
 
     }
+}
+
+private fun initSessionTime(context: Context) {
+    Session.editableFocusTimeState.floatValue = context.getSharedPreferences("time_prefs",0).getFloat("focus_time",25f)
+    Session.editableBreakTimeState.floatValue = context.getSharedPreferences("time_prefs",0).getFloat("break_time",5f)
 }
 
 private fun saveSession(wasFocusing: Boolean, viewModel: SessionLogViewModel) {

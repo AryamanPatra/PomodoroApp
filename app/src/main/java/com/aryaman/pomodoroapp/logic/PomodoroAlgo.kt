@@ -1,33 +1,43 @@
 package com.aryaman.pomodoroapp.logic
 
 import android.annotation.SuppressLint
+import android.app.Application
 import android.os.CountDownTimer
+import androidx.compose.runtime.mutableFloatStateOf
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.ui.platform.LocalContext
+import kotlin.math.roundToInt
 
-object Session{
+object Session {
     val sessionCount = mutableIntStateOf(0)
     val currentSessionType = mutableStateOf(SessionType.None)
-    val timeMap = mapOf(Pair(SessionType.Focus, (0.15*60).toInt()), Pair(SessionType.Break, (0.1*60).toInt()), Pair(SessionType.None, 0))
+    val editableFocusTimeState = mutableFloatStateOf(25f)
+    val editableBreakTimeState = mutableFloatStateOf(5f)
+    val timeMap = mapOf(
+        Pair(SessionType.Focus, (editableFocusTimeState.floatValue * 60).roundToInt()),
+        Pair(SessionType.Break, (editableBreakTimeState.floatValue * 60).roundToInt()),
+        Pair(SessionType.None, 0)
+    )
     val timeLeft = mutableIntStateOf(timeMap.getValue(SessionType.Focus))
 
     private var timer: CountDownTimer? = null
 
-    fun timerStart(){
+    fun timerStart() {
         timer?.cancel()
-        if (currentSessionType.value == SessionType.None){
+        if (currentSessionType.value == SessionType.None) {
             currentSessionType.value = SessionType.Focus
         }
         timer = object : CountDownTimer(timeLeft.intValue * 1000L, 1000) {
             override fun onTick(millisUntilFinished: Long) {
                 timeLeft.intValue = (millisUntilFinished / 1000).toInt()
             }
+
             override fun onFinish() {
-                if (currentSessionType.value == SessionType.Focus){
+                if (currentSessionType.value == SessionType.Focus) {
                     sessionCount.intValue++
                     currentSessionType.value = SessionType.Break
-                }
-                else{
+                } else {
                     currentSessionType.value = SessionType.Focus
                 }
                 timeLeft.intValue = timeMap.getValue(currentSessionType.value)
@@ -36,14 +46,14 @@ object Session{
         }.start()
     }
 
-    fun timerStop(){
+    fun timerStop() {
         timer?.cancel()
         sessionCount.intValue = 0
         currentSessionType.value = SessionType.None
         timeLeft.intValue = timeMap.getValue(SessionType.Focus)
     }
 
-    enum class SessionType{
+    enum class SessionType {
         Focus,
         Break,
         None
