@@ -26,6 +26,7 @@ import com.aryaman.pomodoroapp.logic.Session
 import com.aryaman.pomodoroapp.logic.formatTime
 import com.aryaman.pomodoroapp.ui.SessionLogViewModel
 import java.sql.Date
+import kotlin.math.roundToInt
 
 @Composable
 fun TimerScreen(viewModel: SessionLogViewModel, innerPadding: PaddingValues) {
@@ -67,7 +68,8 @@ fun TimerScreen(viewModel: SessionLogViewModel, innerPadding: PaddingValues) {
                     }
 
                     Session.SessionType.None -> {
-                        Session.timeLeft.intValue = Session.timeMap.getValue(Session.SessionType.Focus).value
+                        Session.timeLeft.intValue =
+                            Session.timeMap.getValue(Session.SessionType.Focus).value
                         Session.timerStart()
                     }
                 }
@@ -110,20 +112,23 @@ fun TimerScreen(viewModel: SessionLogViewModel, innerPadding: PaddingValues) {
 }
 
 private fun initSessionTime(context: Context) {
-    Session.editableFocusTimeState.floatValue = context.getSharedPreferences("time_prefs",0).getFloat("focus_time",25f)
-    Session.editableBreakTimeState.floatValue = context.getSharedPreferences("time_prefs",0).getFloat("break_time",5f)
+    Session.editableFocusTimeState.floatValue =
+        context.getSharedPreferences("time_prefs", 0).getFloat("focus_time", 25f)
+    Session.editableBreakTimeState.floatValue =
+        context.getSharedPreferences("time_prefs", 0).getFloat("break_time", 5f)
 }
 
 private fun saveSession(wasFocusing: Boolean, viewModel: SessionLogViewModel) {
     val sessionCount = Session.sessionCount.intValue
     val timeFocusedInMin =
-        (if (wasFocusing) Session.timeMap[Session.SessionType.Focus]!!.value - Session.timeLeft.intValue else 0) +
-                (sessionCount * Session.timeMap[Session.SessionType.Focus]!!.value)
-    viewModel.upsertSessionLog(
-        SessionLog(
-            sessionCount = sessionCount,
-            totalFocusTimeInMin = timeFocusedInMin,
-            date = Date(System.currentTimeMillis())
+        (((if (wasFocusing) Session.timeMap[Session.SessionType.Focus]!!.value - Session.timeLeft.intValue else 0) +
+                (sessionCount * Session.timeMap[Session.SessionType.Focus]!!.value)) / 60f).roundToInt()
+    if (timeFocusedInMin > 0)
+        viewModel.upsertSessionLog(
+            SessionLog(
+                sessionCount = sessionCount,
+                totalFocusTimeInMin = timeFocusedInMin,
+                date = Date(System.currentTimeMillis())
+            )
         )
-    )
 }
