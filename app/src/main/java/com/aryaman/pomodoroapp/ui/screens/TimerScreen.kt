@@ -67,6 +67,7 @@ fun TimerScreen(viewModel: SessionLogViewModel, innerPadding: PaddingValues) {
                     }
 
                     Session.SessionType.None -> {
+                        Session.timeLeft.intValue = Session.timeMap.getValue(Session.SessionType.Focus).value
                         Session.timerStart()
                     }
                 }
@@ -116,8 +117,8 @@ private fun initSessionTime(context: Context) {
 private fun saveSession(wasFocusing: Boolean, viewModel: SessionLogViewModel) {
     val sessionCount = Session.sessionCount.intValue
     val timeFocusedInMin =
-        (if (wasFocusing) Session.timeMap[Session.SessionType.Focus]!! - Session.timeLeft.intValue else 0) +
-                (sessionCount * Session.timeMap[Session.SessionType.Focus]!!)
+        (if (wasFocusing) Session.timeMap[Session.SessionType.Focus]!!.value - Session.timeLeft.intValue else 0) +
+                (sessionCount * Session.timeMap[Session.SessionType.Focus]!!.value)
     viewModel.upsertSessionLog(
         SessionLog(
             sessionCount = sessionCount,

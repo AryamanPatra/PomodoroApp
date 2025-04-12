@@ -1,12 +1,11 @@
 package com.aryaman.pomodoroapp.logic
 
 import android.annotation.SuppressLint
-import android.app.Application
 import android.os.CountDownTimer
+import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.mutableFloatStateOf
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
-import androidx.compose.ui.platform.LocalContext
 import kotlin.math.roundToInt
 
 object Session {
@@ -15,11 +14,11 @@ object Session {
     val editableFocusTimeState = mutableFloatStateOf(25f)
     val editableBreakTimeState = mutableFloatStateOf(5f)
     val timeMap = mapOf(
-        Pair(SessionType.Focus, (editableFocusTimeState.floatValue * 60).roundToInt()),
-        Pair(SessionType.Break, (editableBreakTimeState.floatValue * 60).roundToInt()),
-        Pair(SessionType.None, 0)
+        Pair(SessionType.Focus, derivedStateOf {(editableFocusTimeState.floatValue * 60).roundToInt()}),
+        Pair(SessionType.Break, derivedStateOf {(editableBreakTimeState.floatValue * 60).roundToInt()}),
+        Pair(SessionType.None, derivedStateOf { 0 })
     )
-    val timeLeft = mutableIntStateOf(timeMap.getValue(SessionType.Focus))
+    val timeLeft = mutableIntStateOf(timeMap.getValue(SessionType.Focus).value)
 
     private var timer: CountDownTimer? = null
 
@@ -40,7 +39,7 @@ object Session {
                 } else {
                     currentSessionType.value = SessionType.Focus
                 }
-                timeLeft.intValue = timeMap.getValue(currentSessionType.value)
+                timeLeft.intValue = timeMap.getValue(currentSessionType.value).value
                 timerStart()
             }
         }.start()
@@ -50,7 +49,7 @@ object Session {
         timer?.cancel()
         sessionCount.intValue = 0
         currentSessionType.value = SessionType.None
-        timeLeft.intValue = timeMap.getValue(SessionType.Focus)
+        timeLeft.intValue = timeMap.getValue(SessionType.Focus).value
     }
 
     enum class SessionType {
